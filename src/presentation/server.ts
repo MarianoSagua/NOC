@@ -1,21 +1,34 @@
-import { CheckService, SendEmailLogs } from "../domain";
-import { FileSystemDataSource, LogRepositoryImpl } from "../infrastructure";
+import {
+  CheckService,
+  CheckServiceMultiple,
+  LogSeverityLevel,
+  SendEmailLogs,
+} from "../domain";
+import {
+  FileSystemDataSource,
+  LogRepositoryImpl,
+  MongoLogDataSource,
+  PostgresLogDataSource,
+} from "../infrastructure";
 import { EmailService } from "./email/email-service";
 import { CronService } from "./cron/cron-service";
+import { envs } from "../config/plugins/evns.plugins";
 
-const fileSystemLogRepository = new LogRepositoryImpl(
-  new FileSystemDataSource()
+const fsLogRepository = new LogRepositoryImpl(new FileSystemDataSource());
+const mongoLogRepository = new LogRepositoryImpl(new MongoLogDataSource());
+const postgresLogRepository = new LogRepositoryImpl(
+  new PostgresLogDataSource()
 );
 
-const emailService = new EmailService();
+// const emailService = new EmailService();
 
 export class Server {
-  static start() {
+  public static async start() {
     console.log("Server Started....");
 
-    new SendEmailLogs(emailService, fileSystemLogRepository).execute([
-      "marianosagua4343@outlook.com",
-    ]);
+    // new SendEmailLogs(emailService, fileSystemLogRepository).execute([
+    //   "marianosagua4343@outlook.com",
+    // ]);
 
     // const emailService = new EmailService();
     // emailService.sendEmailWithFileSystemLogs(["marianosagua4343@outlook.com"]);
@@ -30,12 +43,27 @@ export class Server {
     //   `,
     // });
 
-    // CronService.createJob("*/5 * * * * *", () => {
-    //   const url = "http://localhost:3000";
+    // const logs = await logRepository.getLogs(LogSeverityLevel.low);
+    // console.log(logs);
 
-    //   new CheckService(fileSystemLogRepository, undefined, undefined).execute(
-    //     url
-    //   );
+    // CronService.createJob("*/5 * * * * *", () => {
+    //   const url = envs.URL;
+
+    //   new CheckService(
+    //     fsLogRepository,
+    //     () => console.log(`${url} is ok!`),
+    //     (error) => console.log(error)
+    //   ).execute(url);
     // });
+
+    CronService.createJob("*/2 * * * * *", () => {
+      const url = envs.URL;
+
+      new CheckServiceMultiple(
+        [fsLogRepository, mongoLogRepository, postgresLogRepository],
+        () => console.log(`${url} is ok!`),
+        (error) => console.log(error)
+      ).execute(url);
+    });
   }
 }
