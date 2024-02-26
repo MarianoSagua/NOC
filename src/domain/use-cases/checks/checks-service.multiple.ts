@@ -1,5 +1,5 @@
 import { LogEntity, LogSeverityLevel } from "../../entities/log.entity";
-import { LogRepository } from "../../repositories/log.repository";
+import { LogRepository } from "../../classes/repositories/log.repository";
 
 interface CheckServiceMultipleUseCase {
   execute(url: string): Promise<boolean>;

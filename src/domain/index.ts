@@ -1,6 +1,6 @@
-export * from "./data-sources/log.dataSource";
+export * from "./classes/data-sources/log.dataSource";
 
-export * from "./repositories/log.repository";
+export * from "./classes/repositories/log.repository";
 
 export * from "./use-cases/checks/checks-service";
 export * from "./use-cases/checks/checks-service.multiple";

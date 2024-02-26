@@ -14,7 +14,7 @@ export class PostgresLogDataSource implements LogDataSource {
   async saveLog(log: LogEntity): Promise<void> {
     const level = severityEnum[log.level];
 
-    const newLog = await prismaClient.logModel.create({
+    await prismaClient.logModel.create({
       data: {
         ...log,
         level,
