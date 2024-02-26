@@ -49,7 +49,7 @@ export class Server {
     CronService.createJob("*/5 * * * * *", () => {
       new CheckService(
         fsLogRepository,
-        () => console.log(`${envs.URL} is ok!`),
+        () => {},
         (error) => console.log(error)
       ).execute(envs.URL);
     });
